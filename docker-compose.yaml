@@ -1,0 +1,36 @@
+services:
+
+  pokemon:
+    build: ./pokemon
+    # ports:
+    #   - "5002:5002"
+    volumes:
+      - ./pokemon/src:/usr/src/app/src
+    depends_on:
+      - user
+
+  match:
+    build: ./match
+    # ports:
+    #   - "5001:5001"
+    volumes:
+      - ./match/src:/usr/src/app/src
+      - ./match/package.json:/usr/src/app/package.json
+    depends_on:
+      - user
+
+  user:
+    build: ./user
+    # ports:
+    #   - "5000:5000"
+
+  proxy:
+    image: nginx
+    volumes:
+      - ./proxy:/etc/nginx:ro           #En read-only 
+    ports:
+      - "80:80"
+    depends_on:
+      - user
+      - pokemon
+      - match
