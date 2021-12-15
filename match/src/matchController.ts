@@ -1,7 +1,6 @@
-import "./model"
-
 import MatchRepository from './matchRepository'
-import { Match, MatchStatus } from "./model"
+import { Match, MatchStatus, Pokemon } from "./model"
+import * as MatchService from "./matchService"
 
 import request = require('request');
 
@@ -72,4 +71,15 @@ function userExist(id: number): boolean {
     return flag
 }
 
-export {listMatchs, getMatchById, createMatch, updateMatch}
+function computeRound(match: Match, pokemon1: Pokemon, pokemon2: Pokemon): Promise<any> {
+    var pokemons1:string[] = match.pokemonsPlayer1
+    var pokemons2:string[] = match.pokemonsPlayer2
+    // remove selected pokemon from deck
+    match.pokemonsPlayer1.splice(pokemons1.indexOf(pokemon1.name), 1)
+    match.pokemonsPlayer2.splice(pokemons2.indexOf(pokemon2.name), 1)
+    updateMatch(match)
+    return MatchService.computePokemonWinner(match, pokemon1, pokemon2)
+}
+
+export {listMatchs, getMatchById, createMatch, updateMatch, computeRound}
+
